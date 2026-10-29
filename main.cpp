@@ -11,7 +11,7 @@ constexpr Vector2 ORIGIN      = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
 constexpr int   NUMBER_OF_TILES         = 10;
 constexpr float TILE_DIMENSION          = 50.0f,
                 // in m/ms², since delta time is in ms
-                ACCELERATION_OF_GRAVITY = 981.0f;
+                ACCELERATION_OF_GRAVITY = 4.0f;
 
 // Global Variables
 AppStatus gAppStatus = RUNNING;
@@ -57,6 +57,8 @@ void initialise()
         gProtag->getScale().x / 3.0f,
         gProtag->getScale().y / 3.0f
     });
+
+    gProtag->setAcceleration({0.0f, ACCELERATION_OF_GRAVITY});
 
     /*
         ----------- TILES -----------

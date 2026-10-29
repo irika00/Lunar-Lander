@@ -62,8 +62,16 @@ void Entity::animate(float deltaTime)
 
 void Entity::update(float deltaTime)
 {
-    mPosition.x += mMovement.x * mSpeed * deltaTime;
-    mPosition.y += mMovement.y * mSpeed * deltaTime;
+    // mPosition.x += mMovement.x * mSpeed * deltaTime;
+    // mPosition.y += mMovement.y * mSpeed * deltaTime;
+
+    mVelocity.x = mMovement.x * mSpeed;
+    mVelocity.y += mAcceleration.y * deltaTime;
+
+    mPosition.x += mVelocity.x * deltaTime;
+    mPosition.y += mVelocity.y * deltaTime;
+
+
 
     if (mTextureType == ATLAS && GetLength(mMovement) != 0)
         animate(deltaTime);
