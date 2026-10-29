@@ -1,8 +1,8 @@
 #include "CS3113/Entity.h"
 
 // Global Constants
-constexpr int SCREEN_WIDTH  = 1000,
-              SCREEN_HEIGHT = 600,
+constexpr int SCREEN_WIDTH  = 1200,
+              SCREEN_HEIGHT = 700,
               FPS           = 120;
 
 constexpr char    BG_COLOUR[] = "#C0897E";
@@ -97,6 +97,7 @@ void processInput()
 
     if      (IsKeyDown(KEY_A)) gProtag->moveLeft();
     else if (IsKeyDown(KEY_D)) gProtag->moveRight();
+    else if (IsKeyDown(KEY_W)) gProtag->moveUp();
 
     if (GetLength(gProtag->getMovement()) > 1.0f)
         gProtag->normaliseMovement();
