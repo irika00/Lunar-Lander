@@ -5,7 +5,7 @@ constexpr int SCREEN_WIDTH  = 1450,
               SCREEN_HEIGHT = 800,
               FPS           = 120;
 
-constexpr char    BG_COLOUR[] = "#000080";
+constexpr char    BG_COLOUR[] = "#00004d";
 constexpr Vector2 ORIGIN      = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
 
 constexpr int   NUMBER_OF_TILES         = 17;
@@ -22,6 +22,9 @@ float gPreviousTicks = 0.0f;
 Entity *gProtag = nullptr;
 Entity *gTiles  = nullptr;
 Entity *gSecondTiles  = nullptr;
+Entity *gWinScreen = nullptr;
+Entity *gLoseScreen = nullptr;
+
 
 // Function Declarations
 void initialise();
@@ -90,6 +93,8 @@ void initialise()
 
     for (int i = 0; i < NUMBER_OF_TILES - 1; i++)
     {
+        if (i % 3 == 0 || i % 5 == 0)
+        {
             // assets from @see https://kenney.nl/assets/pixel-platformer-industrial-expansion
             gSecondTiles[i].setTexture("assets/game/mytilw.png");
             gSecondTiles[i].setScale({ TILE_DIMENSION, TILE_DIMENSION});
@@ -98,8 +103,27 @@ void initialise()
             leftMostX + i * TILE_DIMENSION,
             (ORIGIN.y) + 250.0f
             });    
-        
+        }
     }
+
+    // end screens
+    gWinScreen = new Entity(
+        { ORIGIN.x, ORIGIN.y }, // position
+        { SCREEN_WIDTH, SCREEN_HEIGHT },  // scale
+        "assets/game/win.png",          // texture file address
+        SINGLE,                           // single image or atlas?
+        { 0, 0 },                        // atlas dimensions
+        animationAtlas                   // actual atlas
+    );
+
+    gLoseScreen = new Entity(
+        { ORIGIN.x, ORIGIN.y }, // position
+        { SCREEN_WIDTH, SCREEN_HEIGHT },  // scale
+        "assets/game/lose.png",          // texture file address
+        SINGLE,                           // single image or atlas?
+        { 0, 0 },                        // atlas dimensions
+        animationAtlas                   // actual atlas
+    );
 
     SetTargetFPS(FPS);
 }
@@ -146,6 +170,17 @@ void render()
     for (int i = 0; i < NUMBER_OF_TILES; i++) gTiles[i].render();
     for (int i = 0; i < NUMBER_OF_TILES; i++) gSecondTiles[i].render();
 
+    if (gAppStatus == END_WIN)
+    {
+        gWinScreen->render();
+
+    }
+    if (gAppStatus == END_LOSE)
+    {
+        gLoseScreen->render();
+
+    }
+
     EndDrawing();
 }
 
@@ -155,6 +190,8 @@ void shutdown()
     delete gProtag;
     delete[] gTiles;
     delete[] gSecondTiles;
+    delete gLoseScreen;
+    delete gWinScreen;
     CloseWindow();
 }
 
@@ -162,11 +199,20 @@ int main(void)
 {
     initialise();
 
-    while (gAppStatus == RUNNING)
+    while (gAppStatus == RUNNING || gAppStatus == END_LOSE || gAppStatus == END_WIN)
     {
-        processInput();
-        update();
-        render();
+        if (gAppStatus == RUNNING)
+        {
+            processInput();
+            update();
+            render();
+        }
+        else
+        {
+            processInput();
+            render();   
+        }
+     
     }
 
     shutdown();

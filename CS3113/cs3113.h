@@ -14,7 +14,7 @@
 
 #define LOG(argument) std::cout << argument << '\n'
 
-enum AppStatus   { TERMINATED, RUNNING };
+enum AppStatus   { TERMINATED, RUNNING, END_WIN, END_LOSE };
 enum TextureType { SINGLE, ATLAS       };
 
 Color     ColorFromHex(const char *hex);
