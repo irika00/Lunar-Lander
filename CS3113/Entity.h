@@ -29,9 +29,16 @@ private:
     float mAnimationTime     = 0.0f;
 
     int   mSpeed;
+    float mThrust; 
     float mAngle;
+    float mFuel;
+    float mBurnRate;
+    bool mHasPhysics = false;
+
 
     void animate(float deltaTime);
+    void checkCollisionX(Entity *collidableEntities, int collisionCheckCount);
+    void checkCollisionY(Entity *collidableEntities, int collisionCheckCount);
 
 public:
     static constexpr int DEFAULT_SIZE        = 250;
@@ -60,6 +67,7 @@ public:
     void moveRight() { mMovement.x =  1; mDirection = RIGHT; }
 
     void resetMovement() { mMovement = { 0.0f, 0.0f }; }
+    void update(float deltaTime, Entity *collidableEntities, int collisionCheckCount);
 
     Vector2     getPosition()              const { return mPosition;              }
     Vector2     getMovement()              const { return mMovement;              }
@@ -74,6 +82,10 @@ public:
     int         getFrameSpeed()            const { return mFrameSpeed;            }
     int         getSpeed()                 const { return mSpeed;                 }
     float       getAngle()                 const { return mAngle;                 }
+    float       getFuel()                 const { return mFuel;                 }
+    float       getThrust()                 const { return mThrust;                 }
+    float       getBurnRate()               const {return mBurnRate;               }
+    bool isColliding(Entity *other) const;
 
     std::map<Direction, std::vector<int>> getAnimationAtlas() const { return mAnimationAtlas; }
 
@@ -97,6 +109,13 @@ public:
         { mFrameSpeed = newSpeed;                  }
     void setAngle(float newAngle)
         { mAngle = newAngle;                       }
+    void setFuel(float newFuel)
+        { mFuel = newFuel;                           }
+    void setThrust(float newThrust)
+        { mThrust = newThrust;                      }
+    void setBurnRate(float newBurnRate)
+        { mBurnRate = newBurnRate;                  }
+    void setPhysics(bool on) { mHasPhysics = on; }
 };
 
 #endif // ENTITY_H
