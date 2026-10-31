@@ -50,7 +50,6 @@ Entity::~Entity() { UnloadTexture(mTexture); }
  */
 bool Entity::isColliding(Entity *other) const
 {
-    //if (!other->isActive() || other == this) return false;
 
     float xDistance = fabs(mPosition.x - other->getPosition().x) -
         ((mColliderDimensions.x + other->getColliderDimensions().x) / 2.0f);

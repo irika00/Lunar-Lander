@@ -228,12 +228,12 @@ void render()
     ClearBackground(ColorFromHex(BG_COLOUR));
 
     gProtag->render();
-    gProtag->displayCollider();
+    // gProtag->displayCollider();
     DrawText(TextFormat("Fuel: %.0f", gProtag->getFuel()), 20, 20, 30, WHITE);
 
     for (int i = 0; i < gTileCount; i++) {
         gTiles[i].render();
-        gTiles[i].displayCollider();
+        // gTiles[i].displayCollider();
     }
     
 
