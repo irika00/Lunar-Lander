@@ -41,6 +41,9 @@ private:
     Vector2 mColliderUp   = { 87.0f, 159.0f };
     Vector2 mColliderSide = { 65.0f, 146.0f };
     bool    mUseDirectionalCollider = false;
+    float mMoveSpeed = 0.0f;
+    float mMinX = 0.0f, mMaxX = 0.0f;
+    int   mMoveDir = 1;
     
 
 
@@ -54,6 +57,7 @@ public:
     static constexpr int DEFAULT_FRAME_SPEED = 14;
     static constexpr float Y_COLLISION_THRESHOLD = 0.5f;
     float mUpShift = 34.0f; //to exclude the flame from ship
+    float mBrake = 60.0f; 
 
     Entity();
     Entity(Vector2 position, Vector2 scale, const char *textureFilepath);
@@ -70,6 +74,7 @@ public:
     void update(float deltaTime);
     void displayCollider();
     void render();
+    void updatePlatform(float deltaTime);
     void normaliseMovement() { Normalise(&mMovement); }
 
     void moveUp()    { mMovement.y = -1; mDirection = UP;    }
@@ -101,6 +106,7 @@ public:
     bool hasPhysics()       const {return mHasPhysics;}
     float getImpactSpeedY() const { return mImpactSpeedY; }
     bool  hasCrashed()      const { return mCrashed; }
+
 
     std::map<Direction, std::vector<int>> getAnimationAtlas() const { return mAnimationAtlas; }
 
@@ -142,6 +148,8 @@ public:
         mUseDirectionalCollider = true;
         mColliderDimensions = (mDirection == UP) ? up : side;
     }
+    void setPlatformMotion(float speed, float minX, float maxX)
+    { mMoveSpeed = speed; mMinX = minX; mMaxX = maxX; }
 };
 
 #endif // ENTITY_H

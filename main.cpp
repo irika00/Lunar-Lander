@@ -98,6 +98,7 @@ void initialise()
         
     }
     
+    int firstTopIndex = gTileCount; 
 
     for (int i = 0; i < NUMBER_OF_TILES; i++)
     {
@@ -114,6 +115,13 @@ void initialise()
             gTileCount++;
         }
     }
+
+    int first = firstTopIndex; 
+    int last  = gTileCount - 1;
+    gTiles[first].setPlatformMotion(40.0f, gTiles[first].getPosition().x,
+                                       gTiles[first].getPosition().x + 100.0f);
+    gTiles[last ].setPlatformMotion(40.0f, gTiles[last ].getPosition().x - 100.0f,
+                                        gTiles[last ].getPosition().x);
 
     for (int i = 0; i < gTileCount; i++)
     TraceLog(LOG_INFO, "tile %d pos=(%.0f,%.0f) col=(%.0f,%.0f)", i,
@@ -169,6 +177,9 @@ void update()
     {
         if (!gProtag->hasPhysics()) break;
 
+        gTiles[16].updatePlatform(FIXED_TIMESTEP);
+        gTiles[gTileCount - 1].updatePlatform(FIXED_TIMESTEP);
+
         gProtag->update(FIXED_TIMESTEP);
         gProtag->update(FIXED_TIMESTEP, gTiles, gTileCount);
 
@@ -211,7 +222,6 @@ void render()
         gTiles[i].displayCollider();
     }
     
-    // for (int i = 0; i < NUMBER_OF_TILES; i++) gSecondTiles[i].render();
 
     if (gAppStatus == END_WIN)
     {

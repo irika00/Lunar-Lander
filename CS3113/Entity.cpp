@@ -82,6 +82,17 @@ void Entity::animate(float deltaTime)
     }
 }
 
+//for drifting platform
+void Entity::updatePlatform(float deltaTime)
+{
+    if (mMoveSpeed == 0.0f) return;
+
+    mPosition.x += mMoveDir * mMoveSpeed * deltaTime;
+
+    if (mPosition.x > mMaxX) { mPosition.x = mMaxX; mMoveDir = -1; }
+    if (mPosition.x < mMinX) { mPosition.x = mMinX; mMoveDir =  1; }
+}
+
 void Entity::checkCollisionY(Entity *collidableEntities, int collisionCheckCount)
 {
     for (int i = 0; i < collisionCheckCount; i++)
@@ -185,23 +196,44 @@ void Entity::update(float deltaTime)
 {
 
     if (!mHasPhysics) return; 
-    bool hasFuel = mFuel > 0.0f;
+    bool pushX = (mFuel > 0.0f) && mMovement.x != 0.0f;
+    bool pushY = (mFuel > 0.0f )&& mMovement.y != 0.0f;
 
-    if (hasFuel && (mMovement.x != 0.0f || mMovement.y != 0.0f))
+    mAcceleration.y = mGravity + (pushY ? mMovement.y * mThrust : 0.0f);
+
+
+    // if (hasFuel && (mMovement.x != 0.0f || mMovement.y != 0.0f))
+    // {
+    //     mAcceleration.x = mMovement.x * mThrust;
+    //     mAcceleration.y = mGravity + mMovement.y * mThrust; //4.0f = accerelation
+
+    //     int active = (mMovement.x != 0.0f) + (mMovement.y != 0.0f);
+    //     mFuel -= mBurnRate * active * deltaTime;
+    //     if (mFuel < 0.0f) mFuel = 0.0f;
+    // }
+    // else
+    // {
+        
+    //     mAcceleration.x = 0.0f;
+    //     mAcceleration.y = mGravity;
+    // }
+
+    if (pushX)
     {
         mAcceleration.x = mMovement.x * mThrust;
-        mAcceleration.y = mGravity + mMovement.y * mThrust; //4.0f = accerelation
-
-        int active = (mMovement.x != 0.0f) + (mMovement.y != 0.0f);
-        mFuel -= mBurnRate * active * deltaTime;
-        if (mFuel < 0.0f) mFuel = 0.0f;
+    }
+    else if (fabs(mVelocity.x) > mBrake * deltaTime)
+    {
+        mAcceleration.x = (mVelocity.x > 0 ? -mBrake : mBrake);
     }
     else
     {
-        
-        mAcceleration.x = 0.0f;
-        mAcceleration.y = mGravity;
+        mAcceleration.x = -mVelocity.x / deltaTime;
     }
+
+    int active = pushX + pushY;
+    mFuel -= mBurnRate * active * deltaTime;
+    if (mFuel < 0.0f) mFuel = 0.0f;
 
     mVelocity.x += mAcceleration.x * deltaTime;
     mVelocity.y += mAcceleration.y * deltaTime;
