@@ -1,3 +1,22 @@
+/**
+
+* Author: Irika Aggarwal
+
+* Assignment: Lunar Lander!
+
+* Date due: 30 Oct 2020
+
+* I pledge that I have completed this assignment without
+
+* collaborating with anyone else, in conformance with the
+
+* NYU School of Engineering Policies and Procedures on
+
+* Academic Misconduct.
+
+**/
+
+
 #include "CS3113/Entity.h"
 
 // Global Constants
