@@ -38,6 +38,10 @@ private:
     bool  mLanded      = false;
     float mImpactSpeedY = 0.0f;
     bool  mCrashed      = false;
+    Vector2 mColliderUp   = { 87.0f, 159.0f };
+    Vector2 mColliderSide = { 65.0f, 146.0f };
+    bool    mUseDirectionalCollider = false;
+    
 
 
     void animate(float deltaTime);
@@ -49,6 +53,7 @@ public:
     static constexpr int DEFAULT_SPEED       = 200;
     static constexpr int DEFAULT_FRAME_SPEED = 14;
     static constexpr float Y_COLLISION_THRESHOLD = 0.5f;
+    float mUpShift = 34.0f; //to exclude the flame from ship
 
     Entity();
     Entity(Vector2 position, Vector2 scale, const char *textureFilepath);
@@ -63,6 +68,7 @@ public:
     ~Entity();
 
     void update(float deltaTime);
+    void displayCollider();
     void render();
     void normaliseMovement() { Normalise(&mMovement); }
 
@@ -129,6 +135,13 @@ public:
     void setBurnRate(float newBurnRate)
         { mBurnRate = newBurnRate;                  }
     void setPhysics(bool on) { mHasPhysics = on; }
+    void setDirectionalColliders(Vector2 up, Vector2 side)
+    {
+        mColliderUp = up;
+        mColliderSide = side;
+        mUseDirectionalCollider = true;
+        mColliderDimensions = (mDirection == UP) ? up : side;
+    }
 };
 
 #endif // ENTITY_H

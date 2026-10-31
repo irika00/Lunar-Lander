@@ -67,10 +67,7 @@ void initialise()
         animationAtlas                   // actual atlas
     );
 
-    gProtag->setColliderDimensions({
-        gProtag->getScale().x / 3.0f,
-        gProtag->getScale().y / 3.0f
-    });
+    gProtag->setDirectionalColliders({ 87.0f, 150.0f }, { 50.0f, 146.0f });
 
     gProtag->setAcceleration({0.0f, ACCELERATION_OF_GRAVITY});
     gProtag->setThrust(300.0f);
@@ -91,11 +88,12 @@ void initialise()
             // assets from @see https://kenney.nl/assets/pixel-platformer-industrial-expansion
             gTiles[i].setTexture("assets/game/block.png");
             gTiles[i].setScale({ TILE_DIMENSION, TILE_DIMENSION});
-            gTiles[i].setColliderDimensions({ TILE_DIMENSION, TILE_DIMENSION});
+            gTiles[i].setColliderDimensions({ TILE_DIMENSION, TILE_DIMENSION });
             gTiles[i].setPosition({
             leftMostX + i * TILE_DIMENSION,
             (ORIGIN.y) + TILE_DIMENSION + 250.0f 
             });  
+            
             gTileCount++;  
         
     }
@@ -116,6 +114,11 @@ void initialise()
             gTileCount++;
         }
     }
+
+    for (int i = 0; i < gTileCount; i++)
+    TraceLog(LOG_INFO, "tile %d pos=(%.0f,%.0f) col=(%.0f,%.0f)", i,
+             gTiles[i].getPosition().x, gTiles[i].getPosition().y,
+             gTiles[i].getColliderDimensions().x, gTiles[i].getColliderDimensions().y);
 
     // end screens
     gWinScreen = new Entity(
@@ -200,9 +203,14 @@ void render()
     ClearBackground(ColorFromHex(BG_COLOUR));
 
     gProtag->render();
+    gProtag->displayCollider();
     DrawText(TextFormat("Fuel: %.0f", gProtag->getFuel()), 20, 20, 30, WHITE);
 
-    for (int i = 0; i < gTileCount; i++) gTiles[i].render();
+    for (int i = 0; i < gTileCount; i++) {
+        gTiles[i].render();
+        gTiles[i].displayCollider();
+    }
+    
     // for (int i = 0; i < NUMBER_OF_TILES; i++) gSecondTiles[i].render();
 
     if (gAppStatus == END_WIN)

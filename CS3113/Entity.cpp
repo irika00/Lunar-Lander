@@ -152,13 +152,32 @@ void Entity::checkCollisionX(Entity *collidableEntities, int collisionCheckCount
 void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCheckCount)
 {
     if (!mHasPhysics) return;
-
+    if (mUseDirectionalCollider)
+        mColliderDimensions = (mDirection == UP) ? mColliderUp : mColliderSide;
     mPosition.y += mVelocity.y * deltaTime; // after adjusting velocity...
     checkCollisionY(collidableEntities, collisionCheckCount);
     mPosition.x += mVelocity.x * deltaTime;
     checkCollisionX(collidableEntities, collisionCheckCount);
 
 
+}
+void Entity::displayCollider()
+{
+    // draw the collision box
+    Rectangle colliderBox = {
+        mPosition.x - mColliderDimensions.x / 2.0f,
+        mPosition.y - mColliderDimensions.y / 2.0f,
+        mColliderDimensions.x,
+        mColliderDimensions.y
+    };
+
+    DrawRectangleLines(
+        colliderBox.x,      // Top-left X
+        colliderBox.y,      // Top-left Y
+        colliderBox.width,  // Width
+        colliderBox.height, // Height
+        GREEN               // Color
+    );
 }
 
 
@@ -234,8 +253,13 @@ void Entity::render()
         static_cast<float>(mScale.y) / 2.0f
     };
 
-    if (mTextureType == ATLAS && mDirection == UP) //to fix texture
-    destinationArea.width = mScale.y * 0.6f;
+    if (mTextureType == ATLAS && mDirection == UP)
+    {
+        destinationArea.width = mScale.y * 0.6f;
+        destinationArea.y    += mUpShift;
+    }
+
+    originOffset = { destinationArea.width / 2.0f, destinationArea.height / 2.0f };
 
     // Render the texture on screen
     DrawTexturePro(
@@ -244,3 +268,4 @@ void Entity::render()
         mAngle, WHITE
     );
 }
+
