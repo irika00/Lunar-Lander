@@ -33,7 +33,11 @@ private:
     float mAngle;
     float mFuel;
     float mBurnRate;
+    float mGravity = 0.0f;
     bool mHasPhysics = false;
+    bool  mLanded      = false;
+    float mImpactSpeedY = 0.0f;
+    bool  mCrashed      = false;
 
 
     void animate(float deltaTime);
@@ -44,6 +48,7 @@ public:
     static constexpr int DEFAULT_SIZE        = 250;
     static constexpr int DEFAULT_SPEED       = 200;
     static constexpr int DEFAULT_FRAME_SPEED = 14;
+    static constexpr float Y_COLLISION_THRESHOLD = 0.5f;
 
     Entity();
     Entity(Vector2 position, Vector2 scale, const char *textureFilepath);
@@ -86,6 +91,10 @@ public:
     float       getThrust()                 const { return mThrust;                 }
     float       getBurnRate()               const {return mBurnRate;               }
     bool isColliding(Entity *other) const;
+    bool  hasLanded()      const { return mLanded; }
+    bool hasPhysics()       const {return mHasPhysics;}
+    float getImpactSpeedY() const { return mImpactSpeedY; }
+    bool  hasCrashed()      const { return mCrashed; }
 
     std::map<Direction, std::vector<int>> getAnimationAtlas() const { return mAnimationAtlas; }
 
@@ -94,7 +103,11 @@ public:
     void setMovement(Vector2 newMovement)
         { mMovement = newMovement;                 }
     void setAcceleration(Vector2 newAcceleration)
-        { mAcceleration = newAcceleration;         }
+        { 
+            mAcceleration = newAcceleration; 
+            mGravity = newAcceleration.y;
+                
+        }
     void setScale(Vector2 newScale)
         { mScale = newScale;                       }
     void setTexture(const char *textureFilepath)
