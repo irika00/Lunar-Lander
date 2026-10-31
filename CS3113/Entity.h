@@ -3,7 +3,7 @@
 
 #include "cs3113.h"
 
-enum Direction { LEFT, UP, RIGHT, DOWN }; // For walking
+enum Direction { LEFT, UP, RIGHT }; 
 
 class Entity
 {
@@ -78,10 +78,14 @@ public:
     void normaliseMovement() { Normalise(&mMovement); }
 
     void moveUp()    { mMovement.y = -1; mDirection = UP;    }
-    void moveDown()  { mMovement.y =  1; mDirection = DOWN;  }
     void moveLeft()  { mMovement.x = -1; mDirection = LEFT;  }
     void moveRight() { mMovement.x =  1; mDirection = RIGHT; }
+    void resetAcceleration()  { mAcceleration = { 0.0f, mGravity }; }   
 
+    void accelerateLeft()  { mAcceleration.x = -mThrust;            mDirection = LEFT;  }
+    void accelerateRight() { mAcceleration.x =  mThrust;            mDirection = RIGHT; }
+    void accelerateUp()    { mAcceleration.y =  mGravity - mThrust; mDirection = UP;    }
+    bool isSupported(Entity *tiles, int count) const;
     void resetMovement() { mMovement = { 0.0f, 0.0f }; }
     void update(float deltaTime, Entity *collidableEntities, int collisionCheckCount);
 
@@ -106,7 +110,6 @@ public:
     bool hasPhysics()       const {return mHasPhysics;}
     float getImpactSpeedY() const { return mImpactSpeedY; }
     bool  hasCrashed()      const { return mCrashed; }
-
 
     std::map<Direction, std::vector<int>> getAnimationAtlas() const { return mAnimationAtlas; }
 

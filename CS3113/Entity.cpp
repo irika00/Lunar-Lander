@@ -108,7 +108,8 @@ void Entity::checkCollisionY(Entity *collidableEntities, int collisionCheckCount
             {
                 mPosition.y -= yOverlap;       
                 mImpactSpeedY = mVelocity.y; 
-                if (mDirection != UP) mCrashed = true;   
+                bool supported = isSupported(collidableEntities, collisionCheckCount);
+                if (mDirection != UP || !supported) mCrashed = true;  
                 mHasPhysics   = false;        
                 return;
             }
@@ -137,15 +138,10 @@ void Entity::checkCollisionX(Entity *collidableEntities, int collisionCheckCount
             float xDistance = fabs(mPosition.x - collidableEntity->mPosition.x);
             float xOverlap  = fabs(xDistance - (mColliderDimensions.x / 2.0f) - (collidableEntity->mColliderDimensions.x / 2.0f));
 
-            // When standing on a platform, we're always slightly overlapping
-            // it vertically due to gravity, which causes false horizontal
-            // collision detections. So the solution I found is only resolve X
-            // collisions if there's significant Y overlap, preventing the
-            // platform we're standing on from acting like a wall.
+
             float yDistance = fabs(mPosition.y - collidableEntity->mPosition.y);
             float yOverlap  = fabs(yDistance - (mColliderDimensions.y / 2.0f) - (collidableEntity->mColliderDimensions.y / 2.0f));
 
-            // Skip if barely touching vertically (standing on platform)
             if (yOverlap < Y_COLLISION_THRESHOLD) continue;
 
            if (mVelocity.x > 0)      { mPosition.x -= xOverlap;}
@@ -165,7 +161,7 @@ void Entity::update(float deltaTime, Entity *collidableEntities, int collisionCh
     if (!mHasPhysics) return;
     if (mUseDirectionalCollider)
         mColliderDimensions = (mDirection == UP) ? mColliderUp : mColliderSide;
-    mPosition.y += mVelocity.y * deltaTime; // after adjusting velocity...
+    mPosition.y += mVelocity.y * deltaTime; 
     checkCollisionY(collidableEntities, collisionCheckCount);
     mPosition.x += mVelocity.x * deltaTime;
     checkCollisionX(collidableEntities, collisionCheckCount);
@@ -194,54 +190,66 @@ void Entity::displayCollider()
 
 void Entity::update(float deltaTime)
 {
+    if (!mHasPhysics) return;
 
-    if (!mHasPhysics) return; 
-    bool pushX = (mFuel > 0.0f) && mMovement.x != 0.0f;
-    bool pushY = (mFuel > 0.0f )&& mMovement.y != 0.0f;
+    if (mFuel <= 0.0f)
+        mAcceleration = { 0.0f, mGravity };
 
-    mAcceleration.y = mGravity + (pushY ? mMovement.y * mThrust : 0.0f);
-
-
-    // if (hasFuel && (mMovement.x != 0.0f || mMovement.y != 0.0f))
-    // {
-    //     mAcceleration.x = mMovement.x * mThrust;
-    //     mAcceleration.y = mGravity + mMovement.y * mThrust; //4.0f = accerelation
-
-    //     int active = (mMovement.x != 0.0f) + (mMovement.y != 0.0f);
-    //     mFuel -= mBurnRate * active * deltaTime;
-    //     if (mFuel < 0.0f) mFuel = 0.0f;
-    // }
-    // else
-    // {
-        
-    //     mAcceleration.x = 0.0f;
-    //     mAcceleration.y = mGravity;
-    // }
-
-    if (pushX)
-    {
-        mAcceleration.x = mMovement.x * mThrust;
-    }
-    else if (fabs(mVelocity.x) > mBrake * deltaTime)
-    {
-        mAcceleration.x = (mVelocity.x > 0 ? -mBrake : mBrake);
-    }
-    else
-    {
-        mAcceleration.x = -mVelocity.x / deltaTime;
-    }
+    bool pushX = mAcceleration.x != 0.0f;
+    bool pushY = mAcceleration.y != mGravity;
 
     int active = pushX + pushY;
     mFuel -= mBurnRate * active * deltaTime;
     if (mFuel < 0.0f) mFuel = 0.0f;
 
-    mVelocity.x += mAcceleration.x * deltaTime;
+
+    float acc = mAcceleration.x;
+    if (!pushX)
+    {
+        if (fabs(mVelocity.x) > mBrake * deltaTime)
+            acc = (mVelocity.x > 0) ? -mBrake : mBrake;
+        else
+            acc = -mVelocity.x / deltaTime;   
+    }
+
+    mVelocity.x += acc * deltaTime;
     mVelocity.y += mAcceleration.y * deltaTime;
 
-    if (mTextureType == ATLAS && GetLength(mMovement) != 0)
+    if (mTextureType == ATLAS && (pushX || pushY))
         animate(deltaTime);
 }
 
+//to see if ship is landing correctly
+bool Entity::isSupported(Entity *tiles, int count) const
+{
+    float shipBottom = mPosition.y + mColliderDimensions.y / 2.0f;
+    float shipL = mPosition.x - mColliderDimensions.x / 2.0f;
+    float shipR = mPosition.x + mColliderDimensions.x / 2.0f;
+
+    const int SAMPLES = 5;   
+
+    for (int s = 0; s < SAMPLES; s++)
+    {
+        float x = shipL + (shipR - shipL) * s / (SAMPLES - 1);
+        bool overTile = false;
+
+        for (int i = 0; i < count; i++)
+        {
+            float top  = tiles[i].mPosition.y - tiles[i].mColliderDimensions.y / 2.0f;
+            float left = tiles[i].mPosition.x - tiles[i].mColliderDimensions.x / 2.0f;
+            float right = tiles[i].mPosition.x + tiles[i].mColliderDimensions.x / 2.0f;
+
+            if (fabs(shipBottom - top) < 2.0f && x >= left && x <= right)
+            {
+                overTile = true;
+                break;
+            }
+        }
+
+        if (!overTile) return false;   
+    }
+    return true;
+}
 void Entity::render()
 {
     Rectangle textureArea;

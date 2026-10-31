@@ -69,7 +69,6 @@ void initialise()
     */
     std::map<Direction, std::vector<int>> animationAtlas = {
         { UP,    { 0,1,2 } },
-        { DOWN,  { 21,22,23 } },
         { LEFT,  {15,16,17 } },
         { RIGHT, { 6,7,8 } },
     };
@@ -171,15 +170,12 @@ void initialise()
 
 void processInput()
 {
-    gProtag->resetMovement();
+    gProtag->resetAcceleration();
 
-    if      (IsKeyDown(KEY_A)) gProtag->moveLeft();
-    else if (IsKeyDown(KEY_D)) gProtag->moveRight();
-    
-    if (IsKeyDown(KEY_W)) gProtag->moveUp();
+    if      (IsKeyDown(KEY_A)) gProtag->accelerateLeft();
+    else if (IsKeyDown(KEY_D)) gProtag->accelerateRight();
 
-    if (GetLength(gProtag->getMovement()) > 1.0f)
-        gProtag->normaliseMovement();
+    if (IsKeyDown(KEY_W)) gProtag->accelerateUp();
 
     if (IsKeyPressed(KEY_Q) || WindowShouldClose()) gAppStatus = TERMINATED;
 }
