@@ -62,7 +62,7 @@ void shutdown();
 
 void initialise()
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Physics");
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Lunar Lander!");
 
     /*
         ----------- PROTAGONIST -----------
@@ -99,11 +99,10 @@ void initialise()
     gTiles = new Entity[NUMBER_OF_TILES * 2];
     gTileCount = 0;
 
-    float leftMostX =  20.0f;//(NUMBER_OF_TILES * TILE_DIMENSION) / 2.0f ;
+    float leftMostX =  20.0f;
 
     for (int i = 0; i < NUMBER_OF_TILES - 1; i++)
     {
-            // assets from @see https://kenney.nl/assets/pixel-platformer-industrial-expansion
             gTiles[i].setTexture("assets/game/block.png");
             gTiles[i].setScale({ TILE_DIMENSION, TILE_DIMENSION});
             gTiles[i].setColliderDimensions({ TILE_DIMENSION, TILE_DIMENSION });
